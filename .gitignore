@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.venv/
+.DS_Store
+# generated artifacts are committed for inspection; uncomment to regenerate-only:
+# data/genealogy/documents.jsonl
+# data/genealogy/graph.json
+# eval/questions.jsonl

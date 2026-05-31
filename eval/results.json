@@ -1,0 +1,202 @@
+{
+  "vector-only": {
+    "overall": {
+      "recall@1": 0.676,
+      "recall@3": 0.797,
+      "recall@5": 0.811,
+      "recall@10": 0.82,
+      "mrr@10": 0.782,
+      "ndcg@10": 0.786
+    },
+    "by_category": {
+      "lookup": {
+        "recall@1": 0.762,
+        "recall@3": 0.976,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 0.944
+      },
+      "provenance": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "household": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "relational": {
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.048,
+        "mrr@10": 0.016
+      }
+    }
+  },
+  "bm25-only": {
+    "overall": {
+      "recall@1": 0.635,
+      "recall@3": 0.73,
+      "recall@5": 0.77,
+      "recall@10": 0.811,
+      "mrr@10": 0.722,
+      "ndcg@10": 0.74
+    },
+    "by_category": {
+      "lookup": {
+        "recall@1": 0.69,
+        "recall@3": 0.857,
+        "recall@5": 0.929,
+        "recall@10": 1.0,
+        "mrr@10": 0.843
+      },
+      "provenance": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "household": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "relational": {
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr@10": 0.0
+      }
+    }
+  },
+  "hybrid (vector+bm25)": {
+    "overall": {
+      "recall@1": 0.662,
+      "recall@3": 0.797,
+      "recall@5": 0.811,
+      "recall@10": 0.811,
+      "mrr@10": 0.77,
+      "ndcg@10": 0.776
+    },
+    "by_category": {
+      "lookup": {
+        "recall@1": 0.738,
+        "recall@3": 0.976,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 0.929
+      },
+      "provenance": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "household": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "relational": {
+        "recall@1": 0.0,
+        "recall@3": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr@10": 0.0
+      }
+    }
+  },
+  "hybrid + graph": {
+    "overall": {
+      "recall@1": 0.73,
+      "recall@3": 0.986,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 0.959,
+      "ndcg@10": 0.966
+    },
+    "by_category": {
+      "lookup": {
+        "recall@1": 0.738,
+        "recall@3": 0.976,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 0.929
+      },
+      "provenance": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "household": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "relational": {
+        "recall@1": 0.357,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      }
+    }
+  },
+  "hybrid + graph + rerank": {
+    "overall": {
+      "recall@1": 0.797,
+      "recall@3": 0.986,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "ndcg@10": 0.995
+    },
+    "by_category": {
+      "lookup": {
+        "recall@1": 0.857,
+        "recall@3": 0.976,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "provenance": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "household": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      },
+      "relational": {
+        "recall@1": 0.357,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "mrr@10": 1.0
+      }
+    }
+  }
+}

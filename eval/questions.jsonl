@@ -1,0 +1,37 @@
+{"id": "Q001", "category": "lookup", "question": "In what year was Thomas Calloway born?", "relevant_doc_ids": ["D0005"], "answer_entity": "P05", "answer_text": "1878"}
+{"id": "Q002", "category": "lookup", "question": "Where was Thomas Calloway born?", "relevant_doc_ids": ["D0005", "D0086"], "answer_entity": "P05", "answer_text": "Greene County, Georgia"}
+{"id": "Q003", "category": "lookup", "question": "In what year was Alice Calloway born?", "relevant_doc_ids": ["D0012"], "answer_entity": "P12", "answer_text": "1906"}
+{"id": "Q004", "category": "lookup", "question": "Where was Alice Calloway born?", "relevant_doc_ids": ["D0012"], "answer_entity": "P12", "answer_text": "Atlanta, Georgia"}
+{"id": "Q005", "category": "lookup", "question": "In what year was David Calloway born?", "relevant_doc_ids": ["D0020"], "answer_entity": "P19", "answer_text": "1932"}
+{"id": "Q006", "category": "lookup", "question": "Where was David Calloway born?", "relevant_doc_ids": ["D0020", "D0089"], "answer_entity": "P19", "answer_text": "Atlanta, Georgia"}
+{"id": "Q007", "category": "lookup", "question": "In what year was Wilhelm Brandt born?", "relevant_doc_ids": ["D0008"], "answer_entity": "P08", "answer_text": "1875"}
+{"id": "Q008", "category": "lookup", "question": "Where was Wilhelm Brandt born?", "relevant_doc_ids": ["D0008", "D0090"], "answer_entity": "P08", "answer_text": "Charleston, South Carolina"}
+{"id": "Q009", "category": "lookup", "question": "In what year was Clara Mercer born?", "relevant_doc_ids": ["D0014"], "answer_entity": "P14", "answer_text": "1905"}
+{"id": "Q010", "category": "lookup", "question": "Where was Clara Mercer born?", "relevant_doc_ids": ["D0014"], "answer_entity": "P14", "answer_text": "Augusta, Georgia"}
+{"id": "Q011", "category": "lookup", "question": "In what year was Walter Calloway born?", "relevant_doc_ids": ["D0023"], "answer_entity": "P22", "answer_text": "1936"}
+{"id": "Q012", "category": "lookup", "question": "Where was Walter Calloway born?", "relevant_doc_ids": ["D0023"], "answer_entity": "P22", "answer_text": "Cincinnati, Ohio"}
+{"id": "Q013", "category": "lookup", "question": "In what year was Henry Brandt born?", "relevant_doc_ids": ["D0003"], "answer_entity": "P03", "answer_text": "1848"}
+{"id": "Q014", "category": "lookup", "question": "Where was Henry Brandt born?", "relevant_doc_ids": ["D0003"], "answer_entity": "P03", "answer_text": "Charleston, South Carolina"}
+{"id": "Q015", "category": "lookup", "question": "In what year was Nancy Ainsworth born?", "relevant_doc_ids": ["D0022"], "answer_entity": "P21", "answer_text": "1931"}
+{"id": "Q016", "category": "lookup", "question": "Where was Nancy Ainsworth born?", "relevant_doc_ids": ["D0022"], "answer_entity": "P21", "answer_text": "Macon, Georgia"}
+{"id": "Q017", "category": "lookup", "question": "What was the occupation of Josiah Calloway?", "relevant_doc_ids": ["D0060", "D0085"], "answer_entity": "P01", "answer_text": "farmer"}
+{"id": "Q018", "category": "lookup", "question": "What was the occupation of Robert Calloway?", "relevant_doc_ids": ["D0070", "D0087"], "answer_entity": "P11", "answer_text": "accountant"}
+{"id": "Q019", "category": "lookup", "question": "What was the occupation of Charles Ainsworth?", "relevant_doc_ids": ["D0076", "D0088"], "answer_entity": "P17", "answer_text": "attorney"}
+{"id": "Q020", "category": "lookup", "question": "What was the occupation of James Calloway?", "relevant_doc_ids": ["D0072"], "answer_entity": "P13", "answer_text": "engineer"}
+{"id": "Q021", "category": "lookup", "question": "What was the occupation of Susan Calloway?", "relevant_doc_ids": ["D0065"], "answer_entity": "P06", "answer_text": "schoolteacher"}
+{"id": "Q022", "category": "provenance", "question": "Which source record documents the marriage of Josiah Calloway and Martha Whitfield?", "relevant_doc_ids": ["D0026"], "answer_entity": null, "answer_text": "the 1874 marriage record"}
+{"id": "Q023", "category": "provenance", "question": "Which source record documents the marriage of Henry Brandt and Catherine Voss?", "relevant_doc_ids": ["D0027"], "answer_entity": null, "answer_text": "the 1872 marriage record"}
+{"id": "Q024", "category": "provenance", "question": "Which source record documents the marriage of Thomas Calloway and Margaret Brandt?", "relevant_doc_ids": ["D0028"], "answer_entity": null, "answer_text": "the 1901 marriage record"}
+{"id": "Q025", "category": "provenance", "question": "Which source record documents the marriage of Frank Mercer and Susan Calloway?", "relevant_doc_ids": ["D0029"], "answer_entity": null, "answer_text": "the 1903 marriage record"}
+{"id": "Q026", "category": "provenance", "question": "Which source record documents the marriage of Wilhelm Brandt and Ingrid Halvorsen?", "relevant_doc_ids": ["D0030"], "answer_entity": null, "answer_text": "the 1904 marriage record"}
+{"id": "Q027", "category": "provenance", "question": "Which source record documents the marriage of Robert Calloway and Helen Park?", "relevant_doc_ids": ["D0031"], "answer_entity": null, "answer_text": "the 1930 marriage record"}
+{"id": "Q028", "category": "household", "question": "Which children were enumerated in the household of Thomas Calloway in the 1910 census?", "relevant_doc_ids": ["D0042"], "answer_entity": null, "answer_text": "Robert Calloway, Alice Calloway, James Calloway"}
+{"id": "Q029", "category": "household", "question": "Which children were enumerated in the household of Josiah Calloway in the 1880 census?", "relevant_doc_ids": ["D0035"], "answer_entity": null, "answer_text": "Thomas Calloway"}
+{"id": "Q030", "category": "household", "question": "Which children were enumerated in the household of James Calloway in the 1940 census?", "relevant_doc_ids": ["D0058"], "answer_entity": null, "answer_text": "Walter Calloway, Grace Calloway"}
+{"id": "Q031", "category": "relational", "question": "Who was the paternal grandfather of David Calloway?", "relevant_doc_ids": ["D0005", "D0064", "D0086"], "answer_entity": "P05", "answer_text": "Thomas Calloway"}
+{"id": "Q032", "category": "relational", "question": "Who was the paternal grandfather of Ruth Calloway?", "relevant_doc_ids": ["D0005", "D0064", "D0086"], "answer_entity": "P05", "answer_text": "Thomas Calloway"}
+{"id": "Q033", "category": "relational", "question": "Who was the maternal grandfather of Nancy Ainsworth?", "relevant_doc_ids": ["D0005", "D0064", "D0086"], "answer_entity": "P05", "answer_text": "Thomas Calloway"}
+{"id": "Q034", "category": "relational", "question": "Who was the maternal grandmother of Nancy Ainsworth?", "relevant_doc_ids": ["D0007", "D0066"], "answer_entity": "P07", "answer_text": "Margaret Brandt"}
+{"id": "Q035", "category": "relational", "question": "Who was the paternal grandfather of Walter Calloway?", "relevant_doc_ids": ["D0005", "D0064", "D0086"], "answer_entity": "P05", "answer_text": "Thomas Calloway"}
+{"id": "Q036", "category": "relational", "question": "Who was the paternal grandfather of Grace Calloway?", "relevant_doc_ids": ["D0005", "D0064", "D0086"], "answer_entity": "P05", "answer_text": "Thomas Calloway"}
+{"id": "Q037", "category": "relational", "question": "Who was the paternal grandfather of Erik Brandt?", "relevant_doc_ids": ["D0008", "D0067", "D0090"], "answer_entity": "P08", "answer_text": "Wilhelm Brandt"}

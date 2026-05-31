@@ -1,0 +1,8 @@
+# runtime
+sentence-transformers>=2.7,<4
+faiss-cpu>=1.8
+rank-bm25>=0.2.2
+numpy>=1.26
+networkx>=3.2
+# optional: production graph backend (only needed when NEO4J_URI is set)
+# neo4j>=5.20

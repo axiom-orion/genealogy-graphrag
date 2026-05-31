@@ -1,0 +1,918 @@
+{
+  "persons": [
+    {
+      "id": "P01",
+      "name": "Josiah Calloway",
+      "sex": "M",
+      "birth": 1851,
+      "death": 1922,
+      "place": "Greene County, Georgia",
+      "occ": "farmer"
+    },
+    {
+      "id": "P02",
+      "name": "Martha Whitfield",
+      "sex": "F",
+      "birth": 1855,
+      "death": 1931,
+      "place": "Morgan County, Georgia",
+      "occ": "keeping house"
+    },
+    {
+      "id": "P03",
+      "name": "Henry Brandt",
+      "sex": "M",
+      "birth": 1848,
+      "death": 1910,
+      "place": "Charleston, South Carolina",
+      "occ": "blacksmith"
+    },
+    {
+      "id": "P04",
+      "name": "Catherine Voss",
+      "sex": "F",
+      "birth": 1852,
+      "death": 1928,
+      "place": "Savannah, Georgia",
+      "occ": "seamstress"
+    },
+    {
+      "id": "P05",
+      "name": "Thomas Calloway",
+      "sex": "M",
+      "birth": 1878,
+      "death": 1944,
+      "place": "Greene County, Georgia",
+      "occ": "merchant"
+    },
+    {
+      "id": "P06",
+      "name": "Susan Calloway",
+      "sex": "F",
+      "birth": 1881,
+      "death": 1960,
+      "place": "Greene County, Georgia",
+      "occ": "schoolteacher"
+    },
+    {
+      "id": "P07",
+      "name": "Margaret Brandt",
+      "sex": "F",
+      "birth": 1879,
+      "death": 1962,
+      "place": "Charleston, South Carolina",
+      "occ": "keeping house"
+    },
+    {
+      "id": "P08",
+      "name": "Wilhelm Brandt",
+      "sex": "M",
+      "birth": 1875,
+      "death": 1951,
+      "place": "Charleston, South Carolina",
+      "occ": "machinist"
+    },
+    {
+      "id": "P09",
+      "name": "Frank Mercer",
+      "sex": "M",
+      "birth": 1877,
+      "death": 1949,
+      "place": "Augusta, Georgia",
+      "occ": "railroad clerk"
+    },
+    {
+      "id": "P10",
+      "name": "Ingrid Halvorsen",
+      "sex": "F",
+      "birth": 1882,
+      "death": 1965,
+      "place": "Minneapolis, Minnesota",
+      "occ": "keeping house"
+    },
+    {
+      "id": "P11",
+      "name": "Robert Calloway",
+      "sex": "M",
+      "birth": 1903,
+      "death": 1978,
+      "place": "Atlanta, Georgia",
+      "occ": "accountant"
+    },
+    {
+      "id": "P12",
+      "name": "Alice Calloway",
+      "sex": "F",
+      "birth": 1906,
+      "death": 1989,
+      "place": "Atlanta, Georgia",
+      "occ": "librarian"
+    },
+    {
+      "id": "P13",
+      "name": "James Calloway",
+      "sex": "M",
+      "birth": 1909,
+      "death": 1985,
+      "place": "Atlanta, Georgia",
+      "occ": "engineer"
+    },
+    {
+      "id": "P14",
+      "name": "Clara Mercer",
+      "sex": "F",
+      "birth": 1905,
+      "death": 1988,
+      "place": "Augusta, Georgia",
+      "occ": "nurse"
+    },
+    {
+      "id": "P15",
+      "name": "Otto Brandt",
+      "sex": "M",
+      "birth": 1907,
+      "death": 1990,
+      "place": "Chicago, Illinois",
+      "occ": "toolmaker"
+    },
+    {
+      "id": "P16",
+      "name": "Helen Park",
+      "sex": "F",
+      "birth": 1908,
+      "death": 1995,
+      "place": "Knoxville, Tennessee",
+      "occ": "keeping house"
+    },
+    {
+      "id": "P17",
+      "name": "Charles Ainsworth",
+      "sex": "M",
+      "birth": 1904,
+      "death": 1981,
+      "place": "Macon, Georgia",
+      "occ": "attorney"
+    },
+    {
+      "id": "P18",
+      "name": "Dorothy Klein",
+      "sex": "F",
+      "birth": 1911,
+      "death": 1998,
+      "place": "Cincinnati, Ohio",
+      "occ": "keeping house"
+    },
+    {
+      "id": "P25",
+      "name": "Greta Lindqvist",
+      "sex": "F",
+      "birth": 1910,
+      "death": 2001,
+      "place": "Chicago, Illinois",
+      "occ": "keeping house"
+    },
+    {
+      "id": "P19",
+      "name": "David Calloway",
+      "sex": "M",
+      "birth": 1932,
+      "death": 2010,
+      "place": "Atlanta, Georgia",
+      "occ": "physician"
+    },
+    {
+      "id": "P20",
+      "name": "Ruth Calloway",
+      "sex": "F",
+      "birth": 1935,
+      "death": 2018,
+      "place": "Atlanta, Georgia",
+      "occ": "architect"
+    },
+    {
+      "id": "P21",
+      "name": "Nancy Ainsworth",
+      "sex": "F",
+      "birth": 1931,
+      "death": 2015,
+      "place": "Macon, Georgia",
+      "occ": "journalist"
+    },
+    {
+      "id": "P22",
+      "name": "Walter Calloway",
+      "sex": "M",
+      "birth": 1936,
+      "death": 2012,
+      "place": "Cincinnati, Ohio",
+      "occ": "chemist"
+    },
+    {
+      "id": "P23",
+      "name": "Grace Calloway",
+      "sex": "F",
+      "birth": 1939,
+      "death": 2021,
+      "place": "Cincinnati, Ohio",
+      "occ": "teacher"
+    },
+    {
+      "id": "P24",
+      "name": "Erik Brandt",
+      "sex": "M",
+      "birth": 1933,
+      "death": 2008,
+      "place": "Chicago, Illinois",
+      "occ": "draftsman"
+    }
+  ],
+  "relationships": [
+    {
+      "src": "P05",
+      "dst": "P01",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P01",
+      "dst": "P05",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P05",
+      "dst": "P02",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P02",
+      "dst": "P05",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P06",
+      "dst": "P01",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P01",
+      "dst": "P06",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P06",
+      "dst": "P02",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P02",
+      "dst": "P06",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P07",
+      "dst": "P03",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P03",
+      "dst": "P07",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P07",
+      "dst": "P04",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P04",
+      "dst": "P07",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P08",
+      "dst": "P03",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P03",
+      "dst": "P08",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P08",
+      "dst": "P04",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P04",
+      "dst": "P08",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P11",
+      "dst": "P05",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P05",
+      "dst": "P11",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P11",
+      "dst": "P07",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P07",
+      "dst": "P11",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P12",
+      "dst": "P05",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P05",
+      "dst": "P12",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P12",
+      "dst": "P07",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P07",
+      "dst": "P12",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P13",
+      "dst": "P05",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P05",
+      "dst": "P13",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P13",
+      "dst": "P07",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P07",
+      "dst": "P13",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P14",
+      "dst": "P09",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P09",
+      "dst": "P14",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P14",
+      "dst": "P06",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P06",
+      "dst": "P14",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P15",
+      "dst": "P08",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P08",
+      "dst": "P15",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P15",
+      "dst": "P10",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P10",
+      "dst": "P15",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P19",
+      "dst": "P11",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P11",
+      "dst": "P19",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P19",
+      "dst": "P16",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P16",
+      "dst": "P19",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P20",
+      "dst": "P11",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P11",
+      "dst": "P20",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P20",
+      "dst": "P16",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P16",
+      "dst": "P20",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P21",
+      "dst": "P17",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P17",
+      "dst": "P21",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P21",
+      "dst": "P12",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P12",
+      "dst": "P21",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P22",
+      "dst": "P13",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P13",
+      "dst": "P22",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P22",
+      "dst": "P18",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P18",
+      "dst": "P22",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P23",
+      "dst": "P13",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P13",
+      "dst": "P23",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P23",
+      "dst": "P18",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P18",
+      "dst": "P23",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P24",
+      "dst": "P15",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P15",
+      "dst": "P24",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P24",
+      "dst": "P25",
+      "rel": "CHILD_OF"
+    },
+    {
+      "src": "P25",
+      "dst": "P24",
+      "rel": "PARENT_OF"
+    },
+    {
+      "src": "P01",
+      "dst": "P02",
+      "rel": "SPOUSE_OF",
+      "year": 1874,
+      "place": "Morgan County, Georgia"
+    },
+    {
+      "src": "P02",
+      "dst": "P01",
+      "rel": "SPOUSE_OF",
+      "year": 1874,
+      "place": "Morgan County, Georgia"
+    },
+    {
+      "src": "P03",
+      "dst": "P04",
+      "rel": "SPOUSE_OF",
+      "year": 1872,
+      "place": "Charleston, South Carolina"
+    },
+    {
+      "src": "P04",
+      "dst": "P03",
+      "rel": "SPOUSE_OF",
+      "year": 1872,
+      "place": "Charleston, South Carolina"
+    },
+    {
+      "src": "P05",
+      "dst": "P07",
+      "rel": "SPOUSE_OF",
+      "year": 1901,
+      "place": "Charleston, South Carolina"
+    },
+    {
+      "src": "P07",
+      "dst": "P05",
+      "rel": "SPOUSE_OF",
+      "year": 1901,
+      "place": "Charleston, South Carolina"
+    },
+    {
+      "src": "P09",
+      "dst": "P06",
+      "rel": "SPOUSE_OF",
+      "year": 1903,
+      "place": "Greene County, Georgia"
+    },
+    {
+      "src": "P06",
+      "dst": "P09",
+      "rel": "SPOUSE_OF",
+      "year": 1903,
+      "place": "Greene County, Georgia"
+    },
+    {
+      "src": "P08",
+      "dst": "P10",
+      "rel": "SPOUSE_OF",
+      "year": 1904,
+      "place": "Minneapolis, Minnesota"
+    },
+    {
+      "src": "P10",
+      "dst": "P08",
+      "rel": "SPOUSE_OF",
+      "year": 1904,
+      "place": "Minneapolis, Minnesota"
+    },
+    {
+      "src": "P11",
+      "dst": "P16",
+      "rel": "SPOUSE_OF",
+      "year": 1930,
+      "place": "Knoxville, Tennessee"
+    },
+    {
+      "src": "P16",
+      "dst": "P11",
+      "rel": "SPOUSE_OF",
+      "year": 1930,
+      "place": "Knoxville, Tennessee"
+    },
+    {
+      "src": "P17",
+      "dst": "P12",
+      "rel": "SPOUSE_OF",
+      "year": 1929,
+      "place": "Atlanta, Georgia"
+    },
+    {
+      "src": "P12",
+      "dst": "P17",
+      "rel": "SPOUSE_OF",
+      "year": 1929,
+      "place": "Atlanta, Georgia"
+    },
+    {
+      "src": "P13",
+      "dst": "P18",
+      "rel": "SPOUSE_OF",
+      "year": 1934,
+      "place": "Cincinnati, Ohio"
+    },
+    {
+      "src": "P18",
+      "dst": "P13",
+      "rel": "SPOUSE_OF",
+      "year": 1934,
+      "place": "Cincinnati, Ohio"
+    },
+    {
+      "src": "P15",
+      "dst": "P25",
+      "rel": "SPOUSE_OF",
+      "year": 1932,
+      "place": "Chicago, Illinois"
+    },
+    {
+      "src": "P25",
+      "dst": "P15",
+      "rel": "SPOUSE_OF",
+      "year": 1932,
+      "place": "Chicago, Illinois"
+    }
+  ],
+  "person_documents": {
+    "P01": [
+      "D0001",
+      "D0005",
+      "D0006",
+      "D0026",
+      "D0035",
+      "D0036",
+      "D0037",
+      "D0038",
+      "D0060",
+      "D0085"
+    ],
+    "P02": [
+      "D0002",
+      "D0005",
+      "D0006",
+      "D0026",
+      "D0035",
+      "D0036",
+      "D0037",
+      "D0038",
+      "D0061"
+    ],
+    "P03": [
+      "D0003",
+      "D0007",
+      "D0008",
+      "D0027",
+      "D0039",
+      "D0040",
+      "D0041",
+      "D0062"
+    ],
+    "P04": [
+      "D0004",
+      "D0007",
+      "D0008",
+      "D0027",
+      "D0039",
+      "D0040",
+      "D0041",
+      "D0063"
+    ],
+    "P05": [
+      "D0005",
+      "D0011",
+      "D0012",
+      "D0013",
+      "D0028",
+      "D0035",
+      "D0042",
+      "D0043",
+      "D0044",
+      "D0045",
+      "D0060",
+      "D0061",
+      "D0064",
+      "D0086"
+    ],
+    "P06": [
+      "D0006",
+      "D0014",
+      "D0029",
+      "D0046",
+      "D0047",
+      "D0048",
+      "D0049",
+      "D0060",
+      "D0061",
+      "D0065"
+    ],
+    "P07": [
+      "D0007",
+      "D0011",
+      "D0012",
+      "D0013",
+      "D0028",
+      "D0039",
+      "D0042",
+      "D0043",
+      "D0044",
+      "D0045",
+      "D0062",
+      "D0063",
+      "D0066"
+    ],
+    "P08": [
+      "D0008",
+      "D0015",
+      "D0030",
+      "D0039",
+      "D0050",
+      "D0051",
+      "D0052",
+      "D0053",
+      "D0062",
+      "D0063",
+      "D0067",
+      "D0090"
+    ],
+    "P09": [
+      "D0009",
+      "D0014",
+      "D0029",
+      "D0046",
+      "D0047",
+      "D0048",
+      "D0049",
+      "D0068"
+    ],
+    "P10": [
+      "D0010",
+      "D0015",
+      "D0030",
+      "D0050",
+      "D0051",
+      "D0052",
+      "D0053",
+      "D0069"
+    ],
+    "P11": [
+      "D0011",
+      "D0020",
+      "D0021",
+      "D0031",
+      "D0042",
+      "D0043",
+      "D0054",
+      "D0055",
+      "D0064",
+      "D0066",
+      "D0070",
+      "D0087"
+    ],
+    "P12": [
+      "D0012",
+      "D0022",
+      "D0032",
+      "D0042",
+      "D0043",
+      "D0056",
+      "D0057",
+      "D0064",
+      "D0066",
+      "D0071"
+    ],
+    "P13": [
+      "D0013",
+      "D0023",
+      "D0024",
+      "D0033",
+      "D0042",
+      "D0043",
+      "D0058",
+      "D0064",
+      "D0066",
+      "D0072"
+    ],
+    "P14": [
+      "D0014",
+      "D0046",
+      "D0047",
+      "D0065",
+      "D0068",
+      "D0073"
+    ],
+    "P15": [
+      "D0015",
+      "D0025",
+      "D0034",
+      "D0050",
+      "D0051",
+      "D0059",
+      "D0067",
+      "D0069",
+      "D0074"
+    ],
+    "P16": [
+      "D0016",
+      "D0020",
+      "D0021",
+      "D0031",
+      "D0054",
+      "D0055",
+      "D0075"
+    ],
+    "P17": [
+      "D0017",
+      "D0022",
+      "D0032",
+      "D0056",
+      "D0057",
+      "D0076",
+      "D0088"
+    ],
+    "P18": [
+      "D0018",
+      "D0023",
+      "D0024",
+      "D0033",
+      "D0058",
+      "D0077"
+    ],
+    "P19": [
+      "D0020",
+      "D0055",
+      "D0070",
+      "D0075",
+      "D0079",
+      "D0089",
+      "D0091"
+    ],
+    "P20": [
+      "D0021",
+      "D0055",
+      "D0070",
+      "D0075",
+      "D0080",
+      "D0093"
+    ],
+    "P21": [
+      "D0022",
+      "D0057",
+      "D0071",
+      "D0076",
+      "D0081",
+      "D0091"
+    ],
+    "P22": [
+      "D0023",
+      "D0058",
+      "D0072",
+      "D0077",
+      "D0082",
+      "D0092",
+      "D0093"
+    ],
+    "P23": [
+      "D0024",
+      "D0058",
+      "D0072",
+      "D0077",
+      "D0083"
+    ],
+    "P24": [
+      "D0025",
+      "D0059",
+      "D0074",
+      "D0078",
+      "D0084",
+      "D0092"
+    ],
+    "P25": [
+      "D0019",
+      "D0025",
+      "D0034",
+      "D0059",
+      "D0078"
+    ]
+  }
+}
