@@ -141,3 +141,9 @@ genealogy-graphrag/
 ```
 
 MIT-licensed. CI runs lint, tests, and the fast ablation on every push.
+
+---
+
+## Context
+
+Part of [**axiom-orion**](https://github.com/axiom-orion) — small, eval-driven engineering pieces that each turn one hand-waved claim into a reproducible number. The provenance-grounded retrieval and honest ablation shown here are the same principle the [**Vorion**](https://github.com/vorionsys) governed-AI platform (`@vorionsys/*`) applies to autonomous agents: every answer carries the evidence it rests on. Built by [Ryan Cason](https://github.com/vorionsys).
