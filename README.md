@@ -147,3 +147,5 @@ MIT-licensed. CI runs lint, tests, and the fast ablation on every push.
 ## Context
 
 Part of [**axiom-orion**](https://github.com/axiom-orion) — small, eval-driven engineering pieces that each turn one hand-waved claim into a reproducible number. The provenance-grounded retrieval and honest ablation shown here are the same principle the [**Vorion**](https://github.com/vorionsys) governed-AI platform (`@vorionsys/*`) applies to autonomous agents: every answer carries the evidence it rests on. Built by [Ryan Cason](https://github.com/vorionsys).
+
+**Composed in production:** the relational-resolution capability proven here (`<relation> of <person>` → graph traversal, recall@5 0.000 → 1.000) is ported into [**cason-heritage**](https://github.com/axiom-orion/cason-heritage)'s "Keeper", which resolves kinship from the curated family graph instead of asking a model to guess it.
