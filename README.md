@@ -113,6 +113,34 @@ Schema and query-tuning notes live in `src/genealogy_rag/graph/schema.cypher` an
 
 ---
 
+## Weight attestation (Paramesphere S0)
+
+This pipeline runs two open-weight models with full custody — the MiniLM embedder and the
+ms-marco cross-encoder reranker. A tampered embedder corrupts every retrieval downstream
+without raising an error, so `src/genealogy_rag/attest.py` fingerprints the *loaded* weights
+and can verify them against a committed baseline:
+
+```bash
+python scripts/attest_weights.py --demo      # synthetic swap-test, no download (runs in CI)
+python scripts/attest_weights.py             # attest the real embedder + reranker -> attestation/weights.json
+```
+
+```python
+from genealogy_rag.embeddings import Embedder
+att = Embedder().attest()        # -> Attestation(model, fingerprint="wfp:…", params, …)
+```
+
+Honest scope (the same truth-in-claims discipline as below): the loaded-state fingerprint is
+a deterministic, content-addressed digest over tensor *values*. It earns its keep over a
+plain file hash in exactly two cases — it catches tampering applied **after** load, and it is
+**invariant to benign re-serialization** (re-saved/re-sharded weights keep the fingerprint
+while `sha256(file)` changes). It is **not** the subspace `I(θ)` SVD of the Paramesphere
+research line, and it is **not** quantization-robust (re-quantized weights trip it — a known
+false positive). Same-model tamper/swap on a fixed weight set — not cross-model identity. Both
+properties are pinned as executable assertions in `tests/test_attest.py`.
+
+---
+
 ## Scope and honest notes
 
 - **Synthetic data, by design.** The family is generated deterministically (`SEED=17`), so the public repo carries no real-person PII and every gold answer is derivable from the tree rather than hand-asserted. To run over real data, replace the loader in `corpus.py` with a GEDCOM parser — the graph schema (persons, `CHILD_OF`/`SPOUSE_OF`, source `MENTIONS`) maps directly onto GEDCOM individuals, families, and source citations.
@@ -131,11 +159,12 @@ genealogy-graphrag/
 │   └── genealogy/                # documents.jsonl, graph.json  (committed for inspection)
 ├── src/genealogy_rag/
 │   ├── corpus.py  config.py  embeddings.py  retrieval.py  rerank.py  provenance.py  pipeline.py  kinship.py
+│   ├── attest.py  # weight-space attestation (Paramesphere S0)
 │   ├── index/     # vector.py (FAISS), lexical.py (BM25)
 │   └── graph/     # base.py, networkx_store.py, neo4j_store.py, schema.cypher
 ├── eval/          # run_eval.py, questions.jsonl, results.md, results.json
-├── tests/         # pytest: corpus/graph integrity, resolver, retrieval property
-├── scripts/       # build_graph.py, demo.py
+├── tests/         # pytest: corpus/graph integrity, resolver, retrieval property, attest
+├── scripts/       # build_graph.py, demo.py, attest_weights.py
 ├── docker-compose.yml   Makefile   pyproject.toml   requirements.txt
 └── .github/workflows/ci.yml
 ```

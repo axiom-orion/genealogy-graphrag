@@ -12,10 +12,12 @@ jobs:
       - name: install
         run: python -m pip install -e ".[dev]"
       - name: lint
-        run: ruff check src eval data tests
+        run: ruff check src eval data tests scripts
       - name: generate corpus
         run: python data/generate_corpus.py
       - name: tests
         run: pytest -q
+      - name: weight attestation (Paramesphere S0 - synthetic swap-test, no download)
+        run: python scripts/attest_weights.py --demo
       - name: eval (fast - NetworkX backend, no rerank download)
         run: python eval/run_eval.py --fast
