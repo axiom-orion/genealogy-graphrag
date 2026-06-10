@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from .config import settings
+
+if TYPE_CHECKING:
+    from .attest import Attestation
 
 
 class Embedder:
@@ -22,6 +26,12 @@ class Embedder:
             from sentence_transformers import SentenceTransformer
             self._model = SentenceTransformer(self.model_name)
         return self._model
+
+    def attest(self) -> Attestation:
+        """Fingerprint the loaded embedder weights (Paramesphere S0). Loads the model."""
+        from .attest import attest, named_tensors_from_state_dict
+        model = self._load()
+        return attest(self.model_name, named_tensors_from_state_dict(model.state_dict()))
 
     def _key(self, texts: list[str]) -> Path:
         h = hashlib.sha256(
