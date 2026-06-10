@@ -141,6 +141,29 @@ properties are pinned as executable assertions in `tests/test_attest.py`.
 
 ---
 
+## Scribe OCR gate (S2 — self-hosting is earned, not assumed)
+
+Scribe is the agent that turns a scanned record into structured facts. Self-hosting it is
+justified **only by measured accuracy on a frozen eval corpus** — 17th-century secretary hand
+is brutal for every model, so the corpus decides, not enthusiasm. `src/genealogy_rag/scribe.py`
+is the model-agnostic decision machinery: CER / WER (Levenshtein) + structured-field accuracy,
+and a gate that clears a backend for production only when all three clear their bar.
+
+```bash
+python eval/run_scribe_eval.py     # stub backends on the frozen corpus (runs in CI, no download)
+```
+
+A real OCR backend (a self-hosted VLM — TrOCR, Qwen-VL-class, olmOCR) plugs in behind the
+`OcrBackend` protocol; its weights are fingerprinted by the S0 attest module above before it
+is trusted, and running it is the Cloud Run GPU step gated on this harness clearing
+`ScribeThresholds`. **Honest scope:** the bundled `data/scribe/corpus.jsonl` is *synthetic
+placeholder* text whose field ground-truth is the reference extractor's own output — so it
+exercises the gate (perfect stub passes, noisy stub is blocked with named reasons), it does
+**not** measure a real model. The real corpus is built from `/proof` artifacts with verified
+transcriptions — a human step. Claims pinned in `tests/test_scribe.py`.
+
+---
+
 ## Scope and honest notes
 
 - **Synthetic data, by design.** The family is generated deterministically (`SEED=17`), so the public repo carries no real-person PII and every gold answer is derivable from the tree rather than hand-asserted. To run over real data, replace the loader in `corpus.py` with a GEDCOM parser — the graph schema (persons, `CHILD_OF`/`SPOUSE_OF`, source `MENTIONS`) maps directly onto GEDCOM individuals, families, and source citations.
@@ -160,10 +183,12 @@ genealogy-graphrag/
 ├── src/genealogy_rag/
 │   ├── corpus.py  config.py  embeddings.py  retrieval.py  rerank.py  provenance.py  pipeline.py  kinship.py
 │   ├── attest.py  # weight-space attestation (Paramesphere S0)
+│   ├── scribe.py  # OCR/extraction eval harness + the S2 production gate
 │   ├── index/     # vector.py (FAISS), lexical.py (BM25)
 │   └── graph/     # base.py, networkx_store.py, neo4j_store.py, schema.cypher
-├── eval/          # run_eval.py, questions.jsonl, results.md, results.json
-├── tests/         # pytest: corpus/graph integrity, resolver, retrieval property, attest
+├── data/scribe/   # corpus.jsonl — frozen OCR eval corpus (synthetic placeholder)
+├── eval/          # run_eval.py, run_scribe_eval.py, questions.jsonl, results.md
+├── tests/         # pytest: corpus/graph integrity, resolver, retrieval, attest, scribe
 ├── scripts/       # build_graph.py, demo.py, attest_weights.py
 ├── docker-compose.yml   Makefile   pyproject.toml   requirements.txt
 └── .github/workflows/ci.yml

@@ -19,5 +19,7 @@ jobs:
         run: pytest -q
       - name: weight attestation (Paramesphere S0 - synthetic swap-test, no download)
         run: python scripts/attest_weights.py --demo
+      - name: scribe OCR gate (S2 harness - stub backends, no download)
+        run: python eval/run_scribe_eval.py
       - name: eval (fast - NetworkX backend, no rerank download)
         run: python eval/run_eval.py --fast
