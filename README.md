@@ -141,6 +141,21 @@ properties are pinned as executable assertions in `tests/test_attest.py`.
 
 ---
 
+## Attested run manifest (weights → corpus → result)
+
+A retrieval number is only as trustworthy as the chain behind it. `eval/run_eval.py` now
+emits `eval/manifest.json` (`src/genealogy_rag/manifest.py`): a single content-addressed
+record binding **which weights** ran (by their S0 `wfp:` fingerprint) over **which corpus**
+(by content hash) under **which config** to produce **which results** (by digest). Change any
+one — a swapped embedder, an edited document, a tweaked ablation, a different score — and the
+`manifest_id` moves, so a published number can be re-derived and checked rather than taken on
+faith. `verify_manifest()` confirms a manifest is internally consistent. Honest scope: it
+claims nothing the inputs support — a manifest over an unloaded/unattested model carries a
+`null` fingerprint and says so (the reranker is fingerprinted only when a rerank ablation
+actually ran; we don't download a model just to hash it). Pinned in `tests/test_manifest.py`.
+
+---
+
 ## Scribe OCR gate (S2 — self-hosting is earned, not assumed)
 
 Scribe is the agent that turns a scanned record into structured facts. Self-hosting it is
@@ -183,6 +198,7 @@ genealogy-graphrag/
 ├── src/genealogy_rag/
 │   ├── corpus.py  config.py  embeddings.py  retrieval.py  rerank.py  provenance.py  pipeline.py  kinship.py
 │   ├── attest.py  # weight-space attestation (Paramesphere S0)
+│   ├── manifest.py # attested run manifest (weights → corpus → result)
 │   ├── scribe.py  # OCR/extraction eval harness + the S2 production gate
 │   ├── index/     # vector.py (FAISS), lexical.py (BM25)
 │   └── graph/     # base.py, networkx_store.py, neo4j_store.py, schema.cypher
