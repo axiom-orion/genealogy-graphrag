@@ -23,6 +23,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from genealogy_rag.corpus import Question, load_questions  # noqa: E402
+from genealogy_rag.manifest import (  # noqa: E402
+    build_manifest,
+    corpus_digest,
+    model_ref,
+    results_digest,
+)
 from genealogy_rag.pipeline import GenealogyRAG  # noqa: E402
 from genealogy_rag.retrieval import RetrievalConfig  # noqa: E402
 
@@ -157,11 +163,29 @@ def main() -> None:
     ]
     out_md = Path(__file__).resolve().parent / "results.md"
     out_md.write_text("\n".join(md) + "\n")
-    (out_md.with_suffix(".json")).write_text(json.dumps(
-        {name: res for name, res in results}, indent=2))
+    results_obj = {name: res for name, res in results}
+    (out_md.with_suffix(".json")).write_text(json.dumps(results_obj, indent=2))
+
+    # Attested run manifest: bind the weights that ran to the corpus and the results, so a
+    # published number can be re-derived and checked. The embedder was loaded for the eval;
+    # the reranker is attested only when a rerank config actually ran (else it isn't loaded,
+    # and we don't download a model just to fingerprint it).
+    models = [model_ref("embedder", rag.retriever.embedder.attest())]
+    if any(cfg.use_rerank for _, cfg in ablations):
+        models.append(model_ref("reranker", rag.retriever.reranker.attest()))
+    manifest = build_manifest(
+        models,
+        corpus=corpus_digest((d.id, d.searchable) for d in rag.documents),
+        corpus_docs=len(rag.documents),
+        config={"ablations": [name for name, _ in ablations], "k_values": list(K_VALUES),
+                "questions": len(questions)},
+        results=results_digest(results_obj))
+    (out_md.parent / "manifest.json").write_text(manifest.to_json() + "\n")
 
     print("\n" + overall_tbl + "\n\n" + cat_tbl)
-    print(f"\nwrote {out_md} and results.json  (total {time.time()-t0:.1f}s)",
+    print(f"\nattested run {manifest.manifest_id} "
+          f"({len(models)} model(s), corpus {manifest.corpus}, results {manifest.results})")
+    print(f"wrote {out_md}, results.json, and manifest.json  (total {time.time()-t0:.1f}s)",
           file=sys.stderr)
 
 
