@@ -127,8 +127,16 @@ python scripts/attest_weights.py             # attest the real embedder + rerank
 
 ```python
 from genealogy_rag.embeddings import Embedder
-att = Embedder().attest()        # -> Attestation(model, fingerprint="wfp:…", params, …)
+att = Embedder().attest()        # -> Attestation(model, revision, fingerprint="wfp:…",
+                                 #                 artifact_sha256="sha256:…", params, …)
 ```
+
+The §10 S0 record binds three things in one attestation, computed **at model load**: the
+pinned HF **revision** (set `EMBED_REVISION` / `RERANK_REVISION` to the commit SHA at build —
+see `config.py`), the at-rest **`artifact_sha256`** of the local weight files (the cheaper,
+stronger pin; `null` when the model was served straight from the network with nothing on disk
+to hash — it degrades gracefully, never crashing the pipeline), and the **loaded-state
+fingerprint**. The existing weekly drift-audit can regression-check the fingerprint for free.
 
 Honest scope (the same truth-in-claims discipline as below): the loaded-state fingerprint is
 a deterministic, content-addressed digest over tensor *values*. It earns its keep over a
