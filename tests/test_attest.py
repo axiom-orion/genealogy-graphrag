@@ -11,11 +11,13 @@ import pytest
 
 from genealogy_rag.attest import (
     Attestation,
+    artifact_paths_from_dir,
     artifact_sha256,
     attest,
     loaded_state_fingerprint,
     named_tensors_from_state_dict,
     param_count,
+    resolve_model_dir,
     tensor_digest,
     verify,
 )
@@ -144,3 +146,91 @@ def test_artifact_sha256_none_when_absent(tmp_path):
 @pytest.mark.parametrize("seed", [0, 1, 2])
 def test_distinct_models_distinct_fingerprints(seed):
     assert loaded_state_fingerprint(_model(seed)) != loaded_state_fingerprint(_model(seed + 100))
+
+
+# --- S0 §10 record: pinned HF revision + at-rest artifact SHA-256, populated at load -------
+
+def _write_weight_dir(tmp_dir, m, *, fmt="bin", extra=False):
+    """Write a synthetic model dir with HF-shaped weight files (no torch/safetensors needed).
+
+    The filenames are what attest's artifact-glob looks for; the contents are arbitrary bytes
+    standing in for the at-rest artifact, so `artifact_sha256` has something real to hash.
+    """
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    name = "pytorch_model.bin" if fmt == "bin" else "model.safetensors"
+    payload = b"".join(np.ascontiguousarray(v, dtype="<f4").tobytes() for v in m.values())
+    if extra:
+        payload += b"\x00re-serialized-padding"   # same weights, different at-rest bytes
+    (tmp_dir / name).write_bytes(payload)
+    return tmp_dir / name
+
+
+def test_artifact_paths_resolution_degrades_gracefully(tmp_path):
+    # missing / None / non-dir -> [] (never raises): a network-served model with no local
+    # cache attests with artifact_sha256=null, and the pipeline keeps running.
+    assert artifact_paths_from_dir(None) == []
+    assert artifact_paths_from_dir(tmp_path / "does-not-exist") == []
+    f = tmp_path / "afile"
+    f.write_text("x")
+    assert artifact_paths_from_dir(f) == []                      # a file, not a dir
+    assert artifact_paths_from_dir(tmp_path) == []               # empty dir, no weight files
+
+
+def test_artifact_paths_finds_weight_files_when_present(tmp_path):
+    m = _model()
+    _write_weight_dir(tmp_path / "mdl", m, fmt="safetensors")
+    found = artifact_paths_from_dir(tmp_path / "mdl")
+    assert [p.name for p in found] == ["model.safetensors"]
+    assert artifact_sha256(found) is not None                    # hashable at-rest artifact
+
+
+def test_resolve_model_dir_finds_dir_via_config_and_is_none_otherwise(tmp_path):
+    class _Cfg:
+        _name_or_path = str(tmp_path)
+    class _ModelWithConfig:
+        config = _Cfg()
+    assert resolve_model_dir(_ModelWithConfig()) == tmp_path     # found via config._name_or_path
+    assert resolve_model_dir(object()) is None                   # unknown surface -> None, no raise
+
+
+def test_attest_lands_revision_and_artifact_sha_at_load(tmp_path):
+    """The §10 S0 record: one Attestation carrying revision + artifact SHA-256 + fingerprint."""
+    m = _model()
+    _write_weight_dir(tmp_path / "mdl", m)
+    rec = attest("embedder", m, revision="a1b2c3d",
+                 artifact_paths=artifact_paths_from_dir(tmp_path / "mdl"))
+    assert rec.revision == "a1b2c3d"                             # pinned commit recorded
+    assert rec.fingerprint.startswith("wfp:")                    # loaded-state fingerprint
+    assert rec.artifact_sha256 and rec.artifact_sha256.startswith("sha256:")  # at-rest pin
+    # all three survive the JSON round-trip that lands them in attestation.json
+    back = Attestation.from_dict(rec.to_dict())
+    assert (back.revision, back.fingerprint, back.artifact_sha256) == (
+        rec.revision, rec.fingerprint, rec.artifact_sha256)
+
+
+def test_reserialization_holds_fingerprint_while_artifact_sha_moves(tmp_path):
+    """The headline S0 case, end-to-end through the load-time helpers (§4-4 (a)+(b)).
+
+    Re-serialize the *same weights* to a fresh artifact (different bytes). The at-rest
+    artifact_sha256 — a plain file hash — alarms; the loaded-state fingerprint correctly says
+    'same model'. Then a single-value tamper trips the fingerprint, localised to one tensor.
+    """
+    m = _model()
+    d1, d2 = tmp_path / "v1", tmp_path / "v2"
+    _write_weight_dir(d1, m)
+    _write_weight_dir(d2, m, extra=True)                         # identical weights, new bytes
+
+    base = attest("embedder", m, revision="r1",
+                  artifact_paths=artifact_paths_from_dir(d1))
+    reser = attest("embedder", m, revision="r1",
+                   artifact_paths=artifact_paths_from_dir(d2))
+
+    # (a) survives benign re-serialization: fingerprint identical, file hash differs
+    assert reser.fingerprint == base.fingerprint                 # 'same model' — correct
+    assert reser.artifact_sha256 != base.artifact_sha256         # file hash false-alarms
+
+    # (b) trips on tamper, localised to the changed layer (what a file hash cannot localise)
+    tampered = {k: v.copy() for k, v in m.items()}
+    tampered["embeddings.weight"][1, 1] += np.float32(1e-3)
+    res = verify(base, tampered)
+    assert not res.ok and res.changed == ["embeddings.weight"]

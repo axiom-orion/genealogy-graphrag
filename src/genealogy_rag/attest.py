@@ -190,3 +190,54 @@ def named_tensors_from_state_dict(state_dict: dict) -> dict[str, np.ndarray]:
             t = t.detach().to("cpu").float().numpy()
         out[name] = np.asarray(t, dtype=np.float32)
     return out
+
+
+# Weight artifact filenames HF / safetensors / torch write, in order of preference.
+_ARTIFACT_GLOBS = ("*.safetensors", "pytorch_model*.bin", "model*.bin")
+
+
+def artifact_paths_from_dir(model_dir: str | Path | None) -> list[Path]:
+    """The at-rest weight files under a resolved model directory (best-effort, graceful).
+
+    Used at load to populate :func:`artifact_sha256` *when the model is present on disk* —
+    the cheaper, stronger at-rest pin the spec asks for alongside the loaded-state
+    fingerprint (S0, §10). Returns ``[]`` for a missing/unknown directory rather than
+    raising, so a model loaded straight from the network (no local cache to hash) attests
+    with ``artifact_sha256=null`` and the pipeline never crashes on a hashing failure.
+    """
+    if not model_dir:
+        return []
+    d = Path(model_dir)
+    if not d.is_dir():
+        return []
+    for pattern in _ARTIFACT_GLOBS:
+        hits = sorted(d.glob(pattern))
+        if hits:
+            return hits
+    return []
+
+
+def resolve_model_dir(model: object) -> Path | None:
+    """Best-effort: the on-disk directory a loaded HF/sentence-transformers model came from.
+
+    Probes the handful of attributes those libraries expose for the local path, and never
+    raises — an unknown surface simply yields ``None`` (then ``artifact_sha256`` is ``null``).
+    """
+    for attr in ("model_card_data", "_model_config"):  # cheap no-ops if absent, kept explicit
+        getattr(model, attr, None)
+    candidates = [
+        getattr(model, "_model_card_vars", {}).get("base_model") if isinstance(
+            getattr(model, "_model_card_vars", None), dict) else None,
+        getattr(model, "_model_dir", None),
+        getattr(model, "model_path", None),
+        getattr(getattr(model, "config", None), "_name_or_path", None),
+        getattr(getattr(model, "model", None), "name_or_path", None),
+        getattr(model, "name_or_path", None),
+    ]
+    for c in candidates:
+        try:
+            if c and Path(str(c)).is_dir():
+                return Path(str(c))
+        except (TypeError, ValueError, OSError):  # pragma: no cover - defensive
+            continue
+    return None

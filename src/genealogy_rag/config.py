@@ -21,6 +21,13 @@ class Settings:
         "EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2"))
     rerank_model: str = field(default_factory=lambda: os.environ.get(
         "RERANK_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2"))
+    # Pinned HF revision (commit SHA) for each open-weight model (Paramesphere S0, §10).
+    # Pin the exact commit at build via EMBED_REVISION / RERANK_REVISION so the loaded-state
+    # fingerprint landed in attestation.json is bound to a known revision. Unset -> the
+    # attestation records revision=null (the model resolves to whatever HF serves) and the
+    # pipeline degrades gracefully — pinning is a tightening, never a load-time requirement.
+    embed_revision: str | None = field(default_factory=lambda: os.environ.get("EMBED_REVISION"))
+    rerank_revision: str | None = field(default_factory=lambda: os.environ.get("RERANK_REVISION"))
     embed_dim: int = 384
 
     # retrieval defaults
