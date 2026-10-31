@@ -2,7 +2,7 @@
 
 A hybrid retrieval system for **provenance-grounded genealogical question answering**. It fuses dense (sentence-transformer) retrieval, sparse (BM25) retrieval, and **structured kinship-graph resolution**, then reranks with a cross-encoder. Every answer carries the bibliographic citations of the records it rests on.
 
-The system is built to make one point measurable: **dense and lexical retrieval cannot answer relational questions** ("who was the maternal grandfather of X?"), because the answer entity is never named in the query — and a graph can. On the gold set, adding graph resolution takes **relational recall@5 from 0.000 to 1.000** and overall **MRR@10 from 0.77 to 1.00**, with no regression on the question types text retrieval already handles.
+The system is built to make one point measurable: **dense and lexical retrieval cannot answer relational questions** ("who was the maternal grandfather of X?"), because the answer entity is never named in the query — and a graph can. On the gold set, adding graph resolution takes **relational recall@5 from 0.000 to 1.000**, and with cross-encoder reranking on top, overall **MRR@10 rises from 0.77 to 1.00**, with no regression on the question types text retrieval already handles.
 
 Everything here runs on CPU with no external services. The numbers below are produced by `eval/run_eval.py`, not asserted.
 
