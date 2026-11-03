@@ -70,6 +70,10 @@ def names(graph, res) -> list[str] | None:
     ("Who was David's father?", ["Robert Calloway"]),
     # a fuzzy anchor carries its possessive chain: the longest linked span wins
     ("Who was the mother of David Caloway's father?", ["Margaret Brandt"]),
+    # ordinary words after a chain or an anchor, and a title before the name
+    ("When did David Calloway's father die?", ["Robert Calloway"]),
+    ("Tell me about Thomas Calloway's sons", ["James Calloway", "Robert Calloway"]),
+    ("Who was the father of David Calloway, who was born in 1890?", ["Robert Calloway"]),
     # descendants
     ("Who were the grandchildren of Josiah Calloway?",
      ["Alice Calloway", "Clara Mercer", "James Calloway", "Robert Calloway"]),
@@ -155,6 +159,37 @@ def test_missing_generation_finds_nobody(resolver):
     "Who was the father of Eric Brandt?",  # one substitution from Erik Brandt
     "Who was the father of Walker Calloway?",  # one substitution from Walter Calloway
     "Who was the father of Thomas Calloway Jr?",
+    # a qualifier AFTER the name changes the relation or the line
+    "Who was the cousin of David Calloway once removed?",
+    "Who was the cousin of Walter Calloway twice removed?",
+    "Who was the grandfather of David Calloway through his mother?",
+    "Who were the grandparents of David Calloway on his mother's side?",
+    "Who was David Calloway's grandfather through his mother?",
+    # a longer name that merely contains someone in the graph
+    "Who was Mary Susan Calloway's father?",
+    "Who was John Thomas Calloway's father?",
+    "Who was the father of Thomas Calloway-Smith?",
+    "Who was the father of Thomas Calloway Smith?",
+    "Who was the father of Thomas Calloway the younger?",
+    "Who was the father of Thomas Calloway the elder?",
+    "Who was the father of Thomas Calloway V?",
+    "Who was the father of Thomas Calloway 2nd?",
+    # a title: "Mrs. Thomas Calloway" names Thomas's wife in old records
+    "Who was Mrs Thomas Calloway's father?",
+    "Who was the father of Mr David Calloway?",
+    # a second person joined any other way
+    "Who were the parents of David Calloway & Ruth?",
+    "Who were the parents of David Calloway plus Ruth?",
+    "Who were the parents of David Calloway as well as Ruth?",
+    "Who were the parents of David Calloway with Walter?",
+    "Who were the parents of David Calloway, Ruth and Walter?",
+    "Who were the parents of David Calloway/Ruth?",
+    # exclusion phrased without "not"
+    "Exclude Thomas: who was the grandfather of David Calloway?",
+    "Who was the grandfather of David Calloway, ignoring Thomas?",
+    "Everyone but Thomas: who was the grandfather of David Calloway?",
+    "Who was the grandfather of David Calloway without Thomas?",
+    "Neither grandfather of David Calloway is Thomas, right?",
     # the original non-kinship guards
     "Which children were enumerated in the household of Thomas Calloway in the 1910 census?",
     "Which source record documents the marriage of Thomas Calloway and Margaret Brandt?",

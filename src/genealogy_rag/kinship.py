@@ -114,20 +114,44 @@ BEFORE_HEAD_OK = DETERMINERS | {
     "who", "whom", "whose", "which", "what", "was", "were", "is", "are", "be", "been",
     "list", "name", "find", "identify", "show", "give", "tell", "me", "us", "about",
 }
-# Words that may follow a kin term at the end of a possessive chain ("X's father
-# born"). Coordination and relation qualifiers ("cousin once removed") abstain.
-AFTER_HEAD_ABSTAIN = {"and", "or", "nor", "once", "twice", "thrice", "removed", "in", "law"}
 # A bare first name links only when what follows it cannot be a surname.
 FOLLOWS_FIRST_NAME_OK = {
     "in", "who", "whose", "when", "where", "born", "was", "is", "were", "died", "during",
     "on", "at", "from", "before", "after", "lived", "married", "by", "around", "circa",
 }
 NAME_SUFFIXES = {"jr", "sr", "junior", "senior", "ii", "iii", "iv"}
-COORDINATORS = {"and", "or", "nor"}
+# The only words allowed right before an anchor name. Anything else may be part of a
+# longer name ("Mary Susan Calloway", "John Thomas Calloway") or a coordination. Titles
+# abstain too: in old records "Mrs. Thomas Calloway" names Thomas's WIFE.
+BEFORE_ANCHOR_OK = DETERMINERS | {
+    "of", "who", "whom", "whose", "which", "what", "when", "where", "was", "were", "is",
+    "are", "did", "does", "do", "about", "for", "me", "tell", "list", "name", "find",
+    "show", "give",
+}
+# In the "<relation> of <person>" form, the words after the name must open with one of
+# these. Anything else may continue the name ("Calloway Smith", "Calloway the younger")
+# or add another person ("& Ruth", "plus Ruth", "with Walter").
+AFTER_ANCHOR_OK = {
+    "in", "born", "who", "whose", "when", "where", "during", "at", "around", "circa",
+    "living", "lived", "died", "married", "before", "after",
+}
+# Words that, anywhere after the relation, change which line or relation is meant
+# ("through his mother", "on his mother's side", "once removed").
+LINEAGE_WORDS = (
+    SIDES | {"side", "sides", "line", "lineage", "branch", "removed", "once", "twice"}
+    | set(RELATIONS) | set(SYNONYMS) | UNSUPPORTED_KIN
+)
+# The first word after a possessive chain's last kin term may not start a qualifier
+# or another person.
+AFTER_CHAIN_BLOCK = {
+    "and", "or", "nor", "plus", "with", "as", "through", "via", "on", "from", "by",
+    "but", "minus", "once", "twice", "thrice", "removed", "in", "law",
+}
 
 _WORD = re.compile(r"[a-z]+")
 _NEGATION = re.compile(
-    r"\b(?:not|never|nor|no|cannot|except|excluding|besides|else|other|another|"
+    r"\b(?:not|never|nor|no|none|neither|cannot|without|but|minus|except|exclude|excluded|"
+    r"excluding|omit|omitting|ignore|ignoring|besides|else|other|another|"
     r"other\s+than|apart\s+from|aside\s+from|rather\s+than|instead\s+of|"
     r"isnt|wasnt|arent|werent|dont|doesnt|didnt|cant|couldnt|wouldnt|shouldnt|"
     r"hasnt|havent|hadnt)\b|n't\b"
@@ -355,10 +379,9 @@ class RelationResolver:
             trailing = words[head_at + 1:]
             if trailing and not last:
                 return None  # an appositive inside the chain: "X's son Robert's wife"
-            if trailing and (trailing[0] in AFTER_HEAD_ABSTAIN
-                             or SYNONYMS.get(trailing[0], trailing[0]) in RELATIONS
-                             or trailing[0] in UNSUPPORTED_KIN):
-                return None  # "X's father and mother", "X's cousin once removed"
+            if trailing and (trailing[0] in AFTER_CHAIN_BLOCK
+                             or any(w in LINEAGE_WORDS for w in trailing)):
+                return None  # "X's father and mother", "X's grandfather through his mother"
             steps.append(step)
         return steps or None
 
@@ -445,10 +468,12 @@ class RelationResolver:
             mention = fuzzy[0]
         if mention is None:
             return None
-        # "Thomas Calloway Jr" is someone else; "X and Y" asks about two people. (After
-        # a possessive the next word is the "s" of "'s", so this never trips on "X's".)
-        after, before = self._word_after(q, mention.end), self._word_before(q, mention.start)
-        if after in NAME_SUFFIXES or after in COORDINATORS or before in COORDINATORS:
+        # "Mary Susan Calloway" and "Thomas Calloway Jr" are someone else; "Ruth and X"
+        # asks about two people. (After a possessive the next word is the "s" of "'s".)
+        before = self._word_before(q, mention.start)
+        if before is not None and before not in BEFORE_ANCHOR_OK:
+            return None
+        if self._word_after(q, mention.end) in NAME_SUFFIXES:
             return None
         return mention
 
@@ -469,6 +494,13 @@ class RelationResolver:
                 return None
             steps += poss
         of_before = _OF_BEFORE.search(q[: anchor.start])
+        if of_before is not None and tail is None:
+            # "<relation> of <person> ...": what follows the name may not continue it,
+            # add a person, or qualify the relation ("once removed", "through his mother").
+            after = _WORD.findall(q[anchor.end:])
+            if after and (after[0] not in AFTER_ANCHOR_OK
+                          or any(w in LINEAGE_WORDS for w in after)):
+                return None
         if of_before is not None:
             outer = self._of_steps(q[: of_before.start()])
             if outer is None:
