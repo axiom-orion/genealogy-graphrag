@@ -14,21 +14,23 @@ chains of either:
     chains                     "father of the father of X", "X's mother's father",
                                "grandfather of X's sister"
 
-Synonyms map to canonical terms (dad -> father, grandpa -> grandfather) and
-"great" may repeat (great-great-grandfather is one generation past
-great-grandfather). "household of X" or "marriage of X and Y" do not fire: their
-headword is not a kin term.
+Synonyms map to canonical terms (dad -> father, grandpa -> grandfather), "grand
+father" is read as "grandfather", and "great" may repeat (great-great-grandfather
+is one generation past great-grandfather). "household of X" or "marriage of X and
+Y" do not fire: their headword is not a kin term.
 
 When it resolves, the result is treated as AUTHORITATIVE -- the retriever pins the
 targets' records above fuzzy retrieval -- so a wrong resolution is worse than none.
 The resolver therefore ABSTAINS (returns None, and retrieval falls back to the fused
-dense+lexical ranking) whenever it is not sure:
+dense+lexical ranking) whenever the question is not plainly one relation path from
+one person:
 
-  * negation or exclusion        "who was NOT the grandfather of X", "other than"
-  * a relation it doesn't model   uncle, aunt, nephew, in-laws, step-/half-kin
-  * a modifier the relation can't take   "maternal father", "great brother"
-  * contradictory modifiers       "maternal paternal grandfather"
-  * an anchor it can't link to exactly one person, or more than one anchor
+  * negation or exclusion        "who was NOT ...", "the OTHER grandfather", "who else"
+  * a relation it doesn't model   uncle, aunt, in-laws, step-/half-kin, "once removed"
+  * any qualifier on a kin term   "eldest son", "only daughter", "ex-husband", "late wife"
+  * coordination                  "father and mother of X", "parents of X and Y"
+  * a modifier the relation can't take, or contradictory ones   "maternal father"
+  * anything but exactly one person mentioned, or a name it can't link to one person
 """
 from __future__ import annotations
 
@@ -101,29 +103,50 @@ UNSUPPORTED_KIN = {
     "godparent", "godchild", "ancestor", "ancestors", "descendant", "descendants",
     "relative", "relatives", "kin", "inlaw", "inlaws",
 }
-# A qualifier right before a kin term changes its meaning ("half brother",
-# "step father", "foster mother"): the graph's PARENT_OF edges can't tell.
-ABSTAIN_QUALIFIERS = {
-    "half", "step", "foster", "adoptive", "adopted", "god", "birth", "former", "first", "second",
-}
 SIDES = {"maternal", "paternal"}
 GREAT = "great"
 DETERMINERS = {"the", "a", "an", "his", "her", "their", "its"}
+# The only words allowed right before a kin term (and its modifiers) in the
+# "<relation> of <person>" form. Anything else is a qualifier the graph can't honour
+# ("eldest son", "ex husband", "only daughter", "late wife") or a coordination
+# ("father and mother") -- both abstain.
+BEFORE_HEAD_OK = DETERMINERS | {
+    "who", "whom", "whose", "which", "what", "was", "were", "is", "are", "be", "been",
+    "list", "name", "find", "identify", "show", "give", "tell", "me", "us", "about",
+}
+# Words that may follow a kin term at the end of a possessive chain ("X's father
+# born"). Coordination and relation qualifiers ("cousin once removed") abstain.
+AFTER_HEAD_ABSTAIN = {"and", "or", "nor", "once", "twice", "thrice", "removed", "in", "law"}
+# A bare first name links only when what follows it cannot be a surname.
+FOLLOWS_FIRST_NAME_OK = {
+    "in", "who", "whose", "when", "where", "born", "was", "is", "were", "died", "during",
+    "on", "at", "from", "before", "after", "lived", "married", "by", "around", "circa",
+}
+NAME_SUFFIXES = {"jr", "sr", "junior", "senior", "ii", "iii", "iv"}
+COORDINATORS = {"and", "or", "nor"}
 
 _WORD = re.compile(r"[a-z]+")
 _NEGATION = re.compile(
-    r"\b(?:not|never|nor|except|excluding|besides|other\s+than|apart\s+from|"
-    r"aside\s+from|rather\s+than|instead\s+of)\b|n't\b"
+    r"\b(?:not|never|nor|no|cannot|except|excluding|besides|else|other|another|"
+    r"other\s+than|apart\s+from|aside\s+from|rather\s+than|instead\s+of|"
+    r"isnt|wasnt|arent|werent|dont|doesnt|didnt|cant|couldnt|wouldnt|shouldnt|"
+    r"hasnt|havent|hadnt)\b|n't\b"
 )
 _OF_BEFORE = re.compile(r"\bof\s+$")
 _OF_THEN_SPACE = re.compile(r"\bof\s+")
 _OF = re.compile(r"\bof\b")
-_IN_LAW = re.compile(r"^\W*in\W+laws?\b")
-_APOSTROPHES = str.maketrans({"’": "'", "‘": "'", "ʼ": "'", "`": "'"})
+# "grand father", "grand-father", "great grand son" -> one word, so "grand" is never
+# silently dropped (which would answer one generation short).
+_SPLIT_GRAND = re.compile(
+    r"\bgrand[\s-]+(?=(?:father|mother|parent|son|daughter|child|dad|kid)s?\b|children\b)"
+)
+_APOSTROPHES = str.maketrans({"\u2019": "'", "\u2018": "'", "\u02bc": "'", "`": "'"})
 
-# Fuzzy entity linking: a 2-3 word span within this edit distance of exactly one
-# full name links to it; a 1-word span links on a first name only when unique.
-MAX_NAME_EDIT_DISTANCE = 1
+# Fuzzy entity linking (only when no full name appears verbatim): a 2-3 word span
+# links to a full name only when it is one SAFE typo away -- a doubled letter typed
+# once or twice, or two adjacent letters swapped -- and to exactly one person. A
+# letter substitution ("Eric" for "Erik", "Walker" for "Walter") may be a different
+# person and does not link. A 1-word span links on a first name only when unique.
 MIN_FUZZY_NAME_LENGTH = 8
 MIN_FIRST_NAME_LENGTH = 3
 MAX_ANCHOR_SPAN_WORDS = 3
@@ -161,19 +184,31 @@ class Resolution:
         return bool(self.targets)
 
 
-def _edit_distance(a: str, b: str, cap: int) -> int:
-    """Levenshtein distance, short-circuiting once every cell exceeds `cap`."""
-    if abs(len(a) - len(b)) > cap:
-        return cap + 1
-    prev = list(range(len(b) + 1))
-    for i, ca in enumerate(a, 1):
-        cur = [i]
-        for j, cb in enumerate(b, 1):
-            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
-        if min(cur) > cap:
-            return cap + 1
-        prev = cur
-    return prev[-1]
+@dataclass(frozen=True)
+class _Mention:
+    start: int
+    end: int
+    text: str
+    pid: str
+    linked_by: Linking
+
+
+def _is_safe_typo(typed: str, name: str) -> bool:
+    """One adjacent swap, or one doubled letter typed once / a letter typed twice."""
+    if typed == name:
+        return False
+    if len(typed) == len(name):
+        diff = [i for i, (a, b) in enumerate(zip(typed, name, strict=True)) if a != b]
+        return (len(diff) == 2 and diff[1] == diff[0] + 1
+                and typed[diff[0]] == name[diff[1]] and typed[diff[1]] == name[diff[0]])
+    if abs(len(typed) - len(name)) != 1:
+        return False
+    longer, shorter = (typed, name) if len(typed) > len(name) else (name, typed)
+    for i, ch in enumerate(longer):
+        if longer[:i] + longer[i + 1:] == shorter:
+            # the extra letter must double a neighbour: "Calloway" vs "Caloway"
+            return (i > 0 and longer[i - 1] == ch) or (i + 1 < len(longer) and longer[i + 1] == ch)
+    return False
 
 
 class RelationResolver:
@@ -269,107 +304,101 @@ class RelationResolver:
         return Step(relation, sides[0] if sides else None, greats)
 
     @staticmethod
-    def _split_head(words: list[str], head_at: int) -> tuple[list[str], str] | None:
-        """The head word at `head_at` plus the run of modifiers right before it."""
-        i = head_at
-        while i > 0 and (words[i - 1] in SIDES or words[i - 1] == GREAT):
-            i -= 1
-        if i > 0 and words[i - 1] in ABSTAIN_QUALIFIERS:
-            return None
-        return words[i:head_at], words[head_at]
+    def _is_modifier(word: str) -> bool:
+        return word in SIDES or word == GREAT
 
     def _of_steps(self, prefix: str) -> list[Step] | None:
         """Steps from `... <rel> of [the] <rel> of` (the text before the anchor's
-        `of`), anchor-outward. Every segment must END in a kin term; inner segments
-        may hold nothing but a determiner, modifiers and that term."""
+        `of`), anchor-outward. Every segment must END in a kin term preceded only by
+        modifiers and an allowed word; inner segments may hold nothing else."""
         segments = _OF.split(prefix)
         steps: list[Step] = []
         for k, segment in enumerate(segments):
             words = _WORD.findall(segment)
-            if not words:
+            if not words or words[-1] in UNSUPPORTED_KIN:
                 return None
-            if words[-1] in UNSUPPORTED_KIN:
-                return None
-            split = self._split_head(words, len(words) - 1)
-            if split is None:
-                return None
-            mods, head = split
-            leading = words[: len(words) - 1 - len(mods)]
-            if k > 0 and any(w not in DETERMINERS for w in leading):
-                return None  # "father of the first wife of X": an unmodelled qualifier
-            step = self._step(mods, head)
+            head_at = len(words) - 1
+            i = head_at
+            while i > 0 and self._is_modifier(words[i - 1]):
+                i -= 1
+            if i > 0 and words[i - 1] not in BEFORE_HEAD_OK:
+                return None  # "eldest son", "ex husband", "father and mother", ...
+            if k > 0 and any(w not in DETERMINERS for w in words[:i]):
+                return None  # inner hop with extra words: "father of the first wife of X"
+            step = self._step(words[i:head_at], words[head_at])
             if step is None:
                 return None
             steps.append(step)
         return list(reversed(steps))  # written outer-first; applied anchor-outward
 
     def _possessive_steps(self, rest: str) -> list[Step] | None:
-        """Steps from `'s <rel>'s <rel> ...` after the anchor, anchor-outward. The
-        chain ends at the first segment that is not a kin term ("X's father's farm");
-        an unmodelled kin term or an in-law suffix abstains instead."""
+        """Steps from `'s <rel>'s <rel> ...` after the anchor, anchor-outward. Every
+        segment must START with a kin term (after modifiers); only the last may carry
+        trailing words ("X's father born"), and never a coordination or qualifier."""
+        segments = rest.split("'s")
         steps: list[Step] = []
-        for segment in rest.split("'s"):
+        for idx, segment in enumerate(segments):
             words = _WORD.findall(segment)
+            last = idx == len(segments) - 1
             if not words:
-                break
+                if last and steps:
+                    break  # a trailing "'s" with nothing after it
+                return None
             head_at = 0
-            while head_at < len(words) and (words[head_at] in SIDES or words[head_at] == GREAT):
+            while head_at < len(words) and self._is_modifier(words[head_at]):
                 head_at += 1
             if head_at == len(words):
                 return None  # modifiers with no head: "X's great"
-            head = words[head_at]
-            if head in UNSUPPORTED_KIN or head in ABSTAIN_QUALIFIERS:
-                return None
-            relation = SYNONYMS.get(head, head)
-            if relation not in RELATIONS:
-                if head_at > 0:
-                    return None  # "X's maternal uncle"-style: modifiers on a non-kin word
-                break
-            after = segment[segment.find(head) + len(head):]
-            if _IN_LAW.match(after):
-                return None  # "X's father-in-law"
-            step = self._step(words[:head_at], head)
+            step = self._step(words[:head_at], words[head_at])
             if step is None:
-                return None
+                return None  # "X's eldest son", "X's uncle", "X's father's friend"
+            trailing = words[head_at + 1:]
+            if trailing and not last:
+                return None  # an appositive inside the chain: "X's son Robert's wife"
+            if trailing and (trailing[0] in AFTER_HEAD_ABSTAIN
+                             or SYNONYMS.get(trailing[0], trailing[0]) in RELATIONS
+                             or trailing[0] in UNSUPPORTED_KIN):
+                return None  # "X's father and mother", "X's cousin once removed"
             steps.append(step)
         return steps or None
 
     # --- parsing: entity linking ------------------------------------------- #
     @staticmethod
-    def _possessive_tail(q: str, end: int, name: str) -> str | None:
-        """The text after the possessive marker following the anchor, or None."""
+    def _possessive_tail(q: str, end: int, text: str) -> str | None:
+        """The text after the possessive marker following a mention, or None."""
         if q.startswith("'s", end):
             return q[end + 2:]
-        if q.startswith("'", end) and name.endswith("s"):
+        if q.startswith("'", end) and text.endswith("s"):
             return q[end + 1:]
         return None
 
-    def _relation_positions(self, q: str) -> list[tuple[int, int, str, str, Linking]]:
-        """Anchor mentions in a relation position (right after `of`, or right before
-        a possessive), as (start, end, matched text, person id, how it linked)."""
-        # Offsets that directly follow an "of " -- computed once, so checking a span's
-        # position is O(1) rather than a rescan of everything before it.
-        after_of = {m.end() for m in _OF_THEN_SPACE.finditer(q)}
+    @staticmethod
+    def _word_after(q: str, end: int) -> str | None:
+        m = _WORD.search(q, end)
+        return m.group(0) if m else None
 
-        def in_position(start: int, end: int, text: str) -> bool:
-            return start in after_of or self._possessive_tail(q, end, text) is not None
+    @staticmethod
+    def _word_before(q: str, start: int) -> str | None:
+        words = _WORD.findall(q[max(0, start - 40):start])
+        return words[-1] if words else None
 
-        covered = bytearray(len(q))  # characters already inside a longer matched name
-        exact: list[tuple[int, int, str, str, Linking]] = []
+    def _exact_mentions(self, q: str) -> list[tuple[int, int, str, str]]:
+        """Every verbatim full-name mention, longest names first, no overlaps."""
+        covered = bytearray(len(q))
+        found: list[tuple[int, int, str, str]] = []
         for pattern, name, pid in self._name_patterns:
             for m in pattern.finditer(q):
                 s, e = m.span()
                 if any(covered[s:e]):
                     continue  # inside a longer name already matched
                 covered[s:e] = b"\x01" * (e - s)
-                if in_position(s, e, name):
-                    exact.append((s, e, name, pid, "exact"))
-        if exact:
-            return exact
+                found.append((s, e, name, pid))
+        return found
 
-        # No exact name in a relation position: try fuzzy / first-name spans there.
-        found: list[tuple[int, int, str, str, Linking]] = []
-        words = list(re.finditer(r"[a-z]+", q))
+    def _fuzzy_mentions(self, q: str, in_position) -> list[_Mention]:
+        """Typo / first-name links for spans in a relation position, longest first."""
+        found: list[_Mention] = []
+        words = list(_WORD.finditer(q))
         for i in range(len(words)):
             for n in range(1, MAX_ANCHOR_SPAN_WORDS + 1):
                 if i + n > len(words):
@@ -378,43 +407,68 @@ class RelationResolver:
                 text = q[s:e]
                 if not in_position(s, e, text):
                     continue
-                for pid, how in self._link_fuzzy(text, n):
-                    found.append((s, e, text, pid, how))
+                if n == 1:
+                    pids = self._first_names.get(text, [])
+                    follower = self._word_after(q, e)
+                    if (len(text) >= MIN_FIRST_NAME_LENGTH and len(pids) == 1
+                            and (follower is None or follower in FOLLOWS_FIRST_NAME_OK
+                                 or self._possessive_tail(q, e, text) is not None)):
+                        found.append(_Mention(s, e, text, pids[0], "first_name"))
+                elif len(text) >= MIN_FUZZY_NAME_LENGTH:
+                    close = [pid for name, pid in self._names if _is_safe_typo(text, name)]
+                    if len(close) == 1:
+                        found.append(_Mention(s, e, text, close[0], "fuzzy"))
         # Longest span first: in "mother of David Caloway's father" the anchor mention
         # is "david caloway" (whose possessive carries the chain), not the bare "david".
-        found.sort(key=lambda m: m[0] - m[1])
+        found.sort(key=lambda m: m.start - m.end)
         return found
 
-    def _link_fuzzy(self, span: str, n_words: int) -> list[tuple[str, Linking]]:
-        if n_words == 1:
-            pids = self._first_names.get(span, [])
-            if len(span) >= MIN_FIRST_NAME_LENGTH and len(pids) == 1:
-                return [(pids[0], "first_name")]
-            return []
-        if len(span) < MIN_FUZZY_NAME_LENGTH:
-            return []
-        close = [pid for name, pid in self._names
-                 if _edit_distance(span, name, MAX_NAME_EDIT_DISTANCE) <= MAX_NAME_EDIT_DISTANCE]
-        return [(close[0], "fuzzy")] if len(close) == 1 else []
+    def _anchor(self, q: str) -> _Mention | None:
+        """The one person the relation path hangs off, or None (abstain)."""
+        # Offsets that directly follow an "of " -- computed once, so checking a span's
+        # position is O(1) rather than a rescan of everything before it.
+        after_of = {m.end() for m in _OF_THEN_SPACE.finditer(q)}
+
+        def in_position(start: int, end: int, text: str) -> bool:
+            return start in after_of or self._possessive_tail(q, end, text) is not None
+
+        exact = self._exact_mentions(q)
+        if exact:
+            if len(exact) != 1:
+                return None  # two people, or one person twice: not one relation path
+            s, e, name, pid = exact[0]
+            mention = _Mention(s, e, name, pid, "exact") if in_position(s, e, name) else None
+        else:
+            fuzzy = self._fuzzy_mentions(q, in_position)
+            if len({m.pid for m in fuzzy}) != 1:
+                return None  # nobody linked, or the candidate spans disagree
+            mention = fuzzy[0]
+        if mention is None:
+            return None
+        # "Thomas Calloway Jr" is someone else; "X and Y" asks about two people. (After
+        # a possessive the next word is the "s" of "'s", so this never trips on "X's".)
+        after, before = self._word_after(q, mention.end), self._word_before(q, mention.start)
+        if after in NAME_SUFFIXES or after in COORDINATORS or before in COORDINATORS:
+            return None
+        return mention
 
     def _parse(self, query: str) -> tuple[str, list[Step], Linking] | None:
         if len(query) > MAX_QUERY_CHARS:
             return None
-        q = query.lower().translate(_APOSTROPHES)
+        q = _SPLIT_GRAND.sub("grand", query.lower().translate(_APOSTROPHES))
         if _NEGATION.search(q):
             return None
-        mentions = self._relation_positions(q)
-        if len({pid for _, _, _, pid, _ in mentions}) != 1:
-            return None  # no anchor, or more than one person in a relation position
-        s, e, text, pid, how = mentions[0]
+        anchor = self._anchor(q)
+        if anchor is None:
+            return None
         steps: list[Step] = []
-        tail = self._possessive_tail(q, e, text)
+        tail = self._possessive_tail(q, anchor.end, anchor.text)
         if tail is not None:
             poss = self._possessive_steps(tail)
             if poss is None:
                 return None
             steps += poss
-        of_before = _OF_BEFORE.search(q[:s])
+        of_before = _OF_BEFORE.search(q[: anchor.start])
         if of_before is not None:
             outer = self._of_steps(q[: of_before.start()])
             if outer is None:
@@ -422,7 +476,7 @@ class RelationResolver:
             steps += outer
         if not steps:
             return None
-        return pid, steps, how
+        return anchor.pid, steps, anchor.linked_by
 
     # --- resolution --------------------------------------------------------- #
     def resolve(self, query: str) -> Resolution | None:
