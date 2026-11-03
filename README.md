@@ -48,7 +48,7 @@ flowchart LR
   Q --> B["lexical retrieval<br/>BM25"]
   V --> F["RRF fusion"]
   B --> F
-  RP -->|"&lt;relation&gt; of &lt;person&gt; fires"| KG[("kinship graph<br/>NetworkX · Neo4j")]
+  RP -->|"kinship path fires (else abstain)"| KG[("kinship graph<br/>NetworkX · Neo4j")]
   KG --> PIN["pinned answer docs<br/>(salience-ordered)"]
   F --> RR["cross-encoder rerank<br/>(fuzzy tail only)"]
   PIN --> MERGE["merge: pinned first"]
@@ -63,7 +63,7 @@ flowchart LR
 | sparse index | `src/genealogy_rag/index/lexical.py` | BM25Okapi |
 | embeddings | `src/genealogy_rag/embeddings.py` | `all-MiniLM-L6-v2`, L2-normalised, sha256 on-disk cache |
 | graph backends | `src/genealogy_rag/graph/` | one `GraphStore` interface, two implementations: in-memory NetworkX (default) and Neo4j/Cypher (production) |
-| relation resolver | `src/genealogy_rag/kinship.py` | parses `<relation> of <person>`, resolves the target via typed traversal; fires only on kinship questions |
+| relation resolver | `src/genealogy_rag/kinship.py` | parses a relation path anchored on one person — `<relation> of <person>`, `<person>'s <relation>`, and chains of either (`father of the father of X`, `X's mother's father`), with synonyms and repeated "great" — and resolves the targets via typed traversal. Because a resolution is pinned as authoritative, it **abstains** on negation or exclusion ("not", "other", "else"), relations it doesn't model (uncle, in-laws, step-/half-kin, "once removed"), any qualifier on a kin term ("eldest son", "ex-husband") or after the name ("once removed", "through his mother"), coordination ("father and mother", "X and Y", "X & Y"), a longer name or title around a known one ("Mary Susan Calloway", "Calloway-Smith", "Mrs Thomas Calloway"), invalid or contradictory modifiers, and anything but exactly one person it can link. A doubled-letter or swapped-letter typo links; a letter substitution (Eric/Erik) does not, and a bare first name links only when unique and not followed by a surname |
 | retriever | `src/genealogy_rag/retrieval.py` | RRF fusion + pinned graph resolution + tail rerank, each independently ablatable |
 | reranker | `src/genealogy_rag/rerank.py` | `cross-encoder/ms-marco-MiniLM-L-6-v2`; degrades to a no-op if unavailable |
 | eval | `eval/run_eval.py` | recall@k, MRR@10, nDCG@10, overall + per-category, writes `results.md` / `results.json` |
@@ -191,6 +191,7 @@ transcriptions — a human step. Claims pinned in `tests/test_scribe.py`.
 
 - **Synthetic data, by design.** The family is generated deterministically (`SEED=17`), so the public repo carries no real-person PII and every gold answer is derivable from the tree rather than hand-asserted. To run over real data, replace the loader in `corpus.py` with a GEDCOM parser — the graph schema (persons, `CHILD_OF`/`SPOUSE_OF`, source `MENTIONS`) maps directly onto GEDCOM individuals, families, and source citations.
 - **"Provenance" here means source citation** in the genealogical sense — a traceable bibliographic reference per claim — not a cryptographic proof-chain.
+- **The resolver prefers no answer to a wrong one.** Its targets are pinned above fuzzy retrieval, so any parse it is unsure of — "who was *not* the grandfather of X", "X's uncle", "the eldest son of X", "the father of Thomas Jefferson" (a first name in the tree, a surname that isn't) — returns nothing and the question falls back to dense + lexical retrieval. `tests/test_kinship.py` pins both halves: the phrasings it resolves and the ones it must abstain on. The 37 gold questions resolve exactly as before, so the ablation table is unchanged.
 - **The graph stage is structured resolution, not subgraph-RAG.** It resolves a parsed relation to an entity and pins that entity's records. It does not yet do open-ended subgraph retrieval for multi-constraint questions ("descendants of X who lived in Georgia"); that is the natural next extension, along with an LLM answer-synthesis layer over the retrieved-and-cited context.
 - **Eval scale.** 37 questions over 93 documents is enough to separate the configurations cleanly and keep the run deterministic and fast; it is not a claim about behaviour at corpus scale. The FAISS HNSW path and batched embedding cache are there so the same code scales without rewrite.
 

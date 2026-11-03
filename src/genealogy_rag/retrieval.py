@@ -96,7 +96,9 @@ class HybridRetriever:
     def _pinned_docs(self, query: str) -> list[int]:
         """Doc indices the relation resolver vouches for, salience-ordered.
 
-        Fires only on '<relation> of <person>' questions. A resolved target's
+        Fires only on kinship questions (a relation path anchored on one person:
+        '<relation> of <person>', '<person>'s <relation>', or chains of either) and
+        abstains when unsure, since its targets are pinned. A resolved target's
         records are ordered identity-establishing-first (vital -> obituary ->
         biography -> ...), a content-agnostic record-type prior -- not tuned to
         the eval. Empty for non-kinship questions, where retrieval falls back to

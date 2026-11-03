@@ -19,7 +19,8 @@ with no external services; numbers come from `eval/run_eval.py`, not assertions.
 ## Pipeline
 
 `query → relation-parse + entity-link → (dense MiniLM→FAISS-HNSW ∥ BM25) → RRF fusion`;
-in parallel, when `<relation> of <person>` fires, the **kinship graph** (NetworkX / Neo4j)
+in parallel, when a kinship path fires (`<relation> of <person>`, `<person>'s <relation>`, or a
+chain; it abstains when unsure), the **kinship graph** (NetworkX / Neo4j)
 resolves the target person and pins their identity records as authoritative. The fuzzy
 (non-pinned) tail is cross-encoder reranked; pinned answers are merged first → ranked docs
 + citations.
